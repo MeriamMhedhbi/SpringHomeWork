@@ -4,13 +4,16 @@ import com.example.test.entity.Produit;
 import com.example.test.entity.Stock;
 import com.example.test.repositories.ProduitRepo;
 import com.example.test.repositories.StockRepo;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@Slf4j
 public class StockImp implements IStockService{
     @Autowired
     StockRepo stockRepo;
@@ -49,6 +52,19 @@ public class StockImp implements IStockService{
             stockRepo.save(s);
         }
 
+    }
+
+    @Scheduled(cron = "0 0 22 ? * * *")
+    @Override
+    public String retrieveStatusStock() {
+        stockRepo.findAll().stream().filter( stock -> stock.getQteMin()>stock.getQteStock())
+                        .forEach(stock ->
+                                log.info(
+                                        stock.getProduits().toString())
+                                );
+
+
+        return null ;
     }
 
 
